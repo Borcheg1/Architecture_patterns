@@ -35,7 +35,9 @@ def test_allocate_same_line(batch: Batch, order_line: OrderLine) -> None:
         service.post(order_line)
 
 
-def test_allocate_earlier_batch(old_batch: Batch, new_batch: Batch, order_line: OrderLine) -> None:
+def test_allocate_earlier_batch(
+    old_batch: Batch, new_batch: Batch, order_line: OrderLine
+) -> None:
     service = ...
     old_batch_quantity = old_batch.quantity
     expected_quantity = new_batch.quantity - order_line.quantity

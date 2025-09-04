@@ -1,7 +1,7 @@
 import pytest
 from pytest_factoryboy import register
 
-from src.tests.unit.factories import ProductFactory, BatchFactory, OrderLineFactory
+from src.tests.unit.factories import BatchFactory, OrderLineFactory, ProductFactory
 
 register(ProductFactory)
 register(BatchFactory, "batch")
