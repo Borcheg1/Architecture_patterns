@@ -8,7 +8,12 @@ def test_get_batch_by_id(batch: Batch) -> None:
     assert test_batch.id == batch.id
 
 
-def test_allocate_order_positive(batch: Batch, order_line: OrderLine) -> None:
+def test_allocate_order_positive(
+    batch: Batch, order_line: OrderLine, product: Product
+) -> None:
+    batch.product = product
+    order_line.product = product
+
     service = ...
 
     service.post(order_line)
@@ -18,14 +23,24 @@ def test_allocate_order_positive(batch: Batch, order_line: OrderLine) -> None:
     assert batch.quantity == expected_quantity
 
 
-def test_allocate_order_negative(empty_batch: Batch, order_line: OrderLine) -> None:
+def test_allocate_order_negative(
+    empty_batch: Batch, order_line: OrderLine, product: Product
+) -> None:
+    empty_batch.product = product
+    order_line.product = product
+
     service = ...
 
     with pytest.raises("QuantityError"):
         service.post(order_line)
 
 
-def test_allocate_same_line(batch: Batch, order_line: OrderLine) -> None:
+def test_allocate_same_line(
+    batch: Batch, order_line: OrderLine, product: Product
+) -> None:
+    empty_batch.product = product
+    order_line.product = product
+
     service = ...
 
     service.post(order_line)
@@ -36,16 +51,20 @@ def test_allocate_same_line(batch: Batch, order_line: OrderLine) -> None:
 
 
 def test_allocate_earlier_batch(
-    old_batch: Batch, new_batch: Batch, order_line: OrderLine
+    batch: Batch, old_batch: Batch, order_line: OrderLine, product: Product
 ) -> None:
+    batch.product = product
+    old_batch.product = product
+    order_line.product = product
+
     service = ...
     old_batch_quantity = old_batch.quantity
-    expected_quantity = new_batch.quantity - order_line.quantity
+    expected_quantity = batch.quantity - order_line.quantity
 
     service.post(order_line)
 
     old_batch.refresh_from_db()
-    new_batch.refresh_from_db()
+    batch.refresh_from_db()
 
     assert old_batch.quantity == old_batch_quantity
-    assert new_batch.quantity == expected_quantity
+    assert batch.quantity == expected_quantity
