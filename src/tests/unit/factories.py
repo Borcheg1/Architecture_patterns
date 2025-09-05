@@ -1,25 +1,20 @@
-from datetime import datetime
+from random import randint
 
 import factory
 
+from src.models.allocate_dto import OrderLine, Product
+
 
 class ProductFactory(factory.Factory):
-    title = factory.Faker("title")
+    id = randint(1, 1000000)
+    title = factory.Faker("sentence", nb_words=2)
 
     class Meta:
         model = Product
 
 
-class BatchFactory(factory.Factory):
-    product = factory.SubFactory(ProductFactory)
-    quantity = 50
-    eta = datetime.now()
-
-    class Meta:
-        model = Batch
-
-
 class OrderLineFactory(factory.Factory):
+    id = randint(1, 100000)
     product = factory.SubFactory(ProductFactory)
     quantity = 10
 

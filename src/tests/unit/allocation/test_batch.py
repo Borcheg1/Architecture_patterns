@@ -1,70 +1,51 @@
-import pytest
+from src.models.allocate_dto import Product
+from src.tests.unit.conftest import create_order_line_by_product, prepare_batch
+from src.tests.unit.factories import ProductFactory
 
 
-def test_get_batch_by_id(batch: Batch) -> None:
-    service = ...
-    test_batch = service.get(batch.id)
-
-    assert test_batch.id == batch.id
-
-
-def test_allocate_order_positive(
-    batch: Batch, order_line: OrderLine, product: Product
-) -> None:
-    batch.product = product
-    order_line.product = product
-
-    service = ...
-
-    service.post(order_line)
-    expected_quantity = batch.quantity - order_line.quantity
-    batch.refresh_from_db()
-
-    assert batch.quantity == expected_quantity
+def test_can_allocate_if_available_greater_than_required(product: Product) -> None:
+    batch = prepare_batch(product=product, quantity=50)
+    order_line = create_order_line_by_product(product=product, quantity=10)
+    assert batch.can_allocate(order_line) is True
 
 
-def test_allocate_order_negative(
-    empty_batch: Batch, order_line: OrderLine, product: Product
-) -> None:
-    empty_batch.product = product
-    order_line.product = product
-
-    service = ...
-
-    with pytest.raises("QuantityError"):
-        service.post(order_line)
+def test_cannot_allocate_if_available_smaller_than_required(product: Product) -> None:
+    batch = prepare_batch(product=product, quantity=10)
+    order_line = create_order_line_by_product(product=product, quantity=20)
+    assert batch.can_allocate(order_line) is False
 
 
-def test_allocate_same_line(
-    batch: Batch, order_line: OrderLine, product: Product
-) -> None:
-    empty_batch.product = product
-    order_line.product = product
-
-    service = ...
-
-    service.post(order_line)
-    batch.refresh_from_db()
-
-    with pytest.raises("UsedOrderLineError"):
-        service.post(order_line)
+def test_can_allocate_if_available_equal_to_required(product: Product) -> None:
+    batch = prepare_batch(product=product, quantity=10)
+    order_line = create_order_line_by_product(product=product, quantity=10)
+    assert batch.can_allocate(order_line) is True
 
 
-def test_allocate_earlier_batch(
-    batch: Batch, old_batch: Batch, order_line: OrderLine, product: Product
-) -> None:
-    batch.product = product
-    old_batch.product = product
-    order_line.product = product
+def test_cannot_allocate_if_title_do_not_match(product: Product) -> None:
+    batch = prepare_batch(product=product)
+    another_product = ProductFactory.build(title="SOME_PRODUCT")
+    order_line = create_order_line_by_product(product=another_product)
 
-    service = ...
-    old_batch_quantity = old_batch.quantity
-    expected_quantity = batch.quantity - order_line.quantity
+    assert batch.can_allocate(order_line) is False
 
-    service.post(order_line)
 
-    old_batch.refresh_from_db()
-    batch.refresh_from_db()
+def test_can_only_deallocate_allocated_lines(product: Product) -> None:
+    excepted_quantity = 10
+    batch = prepare_batch(product=product, quantity=excepted_quantity)
+    order_line = create_order_line_by_product(product=product, quantity=10)
 
-    assert old_batch.quantity == old_batch_quantity
-    assert batch.quantity == expected_quantity
+    batch.deallocate(order_line)
+
+    assert batch.available_quantity == excepted_quantity
+
+
+def test_allocation_is_idempotent(product: Product) -> None:
+    batch = prepare_batch(product=product, quantity=50)
+    order_line = create_order_line_by_product(product=product, quantity=10)
+
+    excepted_quantity = batch.available_quantity - order_line.quantity
+
+    batch.allocate(order_line)
+    batch.allocate(order_line)
+
+    assert batch.available_quantity == excepted_quantity

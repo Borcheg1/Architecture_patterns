@@ -1,20 +1,25 @@
 import datetime
+import random
 
-import pytest
 from pytest_factoryboy import register
 
-from src.tests.unit.factories import BatchFactory, OrderLineFactory, ProductFactory
+from src.models.allocate_dto import Batch, OrderLine, Product
+from src.tests.unit.factories import OrderLineFactory, ProductFactory
 
 register(ProductFactory, "product")
-register(BatchFactory, "batch")
 register(OrderLineFactory, "order_line")
 
 
-@pytest.fixture()
-def empty_batch() -> Batch:
-    return BatchFactory(quantity=0)
+def create_order_line_by_product(product: Product, quantity: int = 10) -> OrderLine:
+    return OrderLineFactory.build(product=product, quantity=quantity)
 
 
-@pytest.fixture()
-def old_batch() -> Batch:
-    return BatchFactory(eta=datetime.datetime(year=2020, month=1, day=1))
+def prepare_batch(
+    product: Product,
+    reference: str | None = None,
+    quantity: int = 50,
+    eta: datetime.datetime | None = None,
+) -> Batch:
+    if not reference:
+        reference = str(random.randint(1, 100000))
+    return Batch(ref=reference, product=product, quantity=quantity, eta=eta)

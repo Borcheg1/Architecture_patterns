@@ -1,8 +1,8 @@
 test-unit:
-  pytest tests/unit
+	pytest src/tests/unit
 
 test-e2e:
-  pytest tests/e2e
+	pytest src/tests/e2e
 
 test-integ:
-  pytest tests/integ
+	pytest src/tests/integ
