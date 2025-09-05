@@ -1,2 +1,2 @@
-# Architecture_patterns
+# Architecture patterns
 Project from book
