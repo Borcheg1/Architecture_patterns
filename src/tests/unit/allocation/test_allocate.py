@@ -1,17 +1,18 @@
+# stdlib
 from datetime import datetime, timedelta
 
+# thirdparty
 import pytest
 
+# project
 from src.exceptions.allocate import OutOfStock
-from src.models.allocate_dto import Product, allocate
+from src.models.domain_models import Product, allocate
 from src.tests.unit.conftest import create_order_line_by_product, prepare_batch
 
 
 def test_prefers_current_stock_batches_to_shipments(product: Product) -> None:
     in_stock_batch = prepare_batch(product=product, quantity=50)
-    shipment_batch = prepare_batch(
-        product=product, quantity=50, eta=datetime.now() - timedelta(days=1)
-    )
+    shipment_batch = prepare_batch(product=product, quantity=50, eta=datetime.now() - timedelta(days=1))
     order_line = create_order_line_by_product(product=product, quantity=10)
 
     allocate(order_line, [in_stock_batch, shipment_batch])
@@ -22,12 +23,8 @@ def test_prefers_current_stock_batches_to_shipments(product: Product) -> None:
 
 def test_prefers_earlier_batches(product: Product) -> None:
     earliest = prepare_batch(product=product, quantity=50, eta=datetime.now())
-    medium = prepare_batch(
-        product=product, quantity=50, eta=datetime.now() + timedelta(days=1)
-    )
-    latest = prepare_batch(
-        product=product, quantity=50, eta=datetime.now() + timedelta(days=5)
-    )
+    medium = prepare_batch(product=product, quantity=50, eta=datetime.now() + timedelta(days=1))
+    latest = prepare_batch(product=product, quantity=50, eta=datetime.now() + timedelta(days=5))
     order_line = create_order_line_by_product(product=product, quantity=10)
 
     allocate(order_line, [medium, earliest, latest])
@@ -39,9 +36,7 @@ def test_prefers_earlier_batches(product: Product) -> None:
 
 def test_returns_allocated_batch_ref(product: Product) -> None:
     in_stock_batch = prepare_batch(product=product, quantity=50)
-    shipment_batch = prepare_batch(
-        product=product, quantity=50, eta=datetime.now() - timedelta(days=1)
-    )
+    shipment_batch = prepare_batch(product=product, quantity=50, eta=datetime.now() - timedelta(days=1))
     order_line = create_order_line_by_product(product=product, quantity=10)
 
     allocation = allocate(order_line, [in_stock_batch, shipment_batch])

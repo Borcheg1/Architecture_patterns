@@ -1,12 +1,12 @@
-from random import randint
-
+# mypy: ignore-errors
+# thirdparty
 import factory
 
-from src.models.allocate_dto import OrderLine, Product
+# project
+from src.models.domain_models import OrderLine, Product
 
 
 class ProductFactory(factory.Factory):
-    id = randint(1, 1000000)
     title = factory.Faker("sentence", nb_words=2)
 
     class Meta:
@@ -14,7 +14,7 @@ class ProductFactory(factory.Factory):
 
 
 class OrderLineFactory(factory.Factory):
-    id = randint(1, 100000)
+    order_id = factory.Faker("sentence", nb_words=1)
     product = factory.SubFactory(ProductFactory)
     quantity = 10
 

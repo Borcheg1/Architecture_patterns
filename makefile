@@ -6,3 +6,9 @@ test-e2e:
 
 test-integ:
 	pytest src/tests/integ
+
+docker-build:
+	docker compose build --no-cache
+
+docker-up:
+	docker compose up

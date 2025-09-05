@@ -1,19 +1,20 @@
+# stdlib
 import datetime
 from dataclasses import dataclass
 from typing import Any
 
+# project
 from src.exceptions.allocate import OutOfStock
 
 
-@dataclass(frozen=True)
+@dataclass(unsafe_hash=True)
 class Product:
-    id: int
     title: str
 
 
-@dataclass(frozen=True)
+@dataclass(unsafe_hash=True)
 class OrderLine:
-    id: int
+    order_id: str
     product: Product
     quantity: int
 
@@ -56,10 +57,7 @@ class Batch:
             self._allocations.remove(order_line)
 
     def can_allocate(self, order_line: OrderLine) -> bool:
-        return (
-            self.product.title == order_line.product.title
-            and self.available_quantity >= order_line.quantity
-        )
+        return self.product.title == order_line.product.title and self.available_quantity >= order_line.quantity
 
     @property
     def allocated_quantity(self) -> int:

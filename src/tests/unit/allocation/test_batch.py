@@ -1,4 +1,5 @@
-from src.models.allocate_dto import Product
+# project
+from src.models.domain_models import Product
 from src.tests.unit.conftest import create_order_line_by_product, prepare_batch
 from src.tests.unit.factories import ProductFactory
 

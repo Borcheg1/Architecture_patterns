@@ -5,11 +5,93 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "fastapi>=0.116.1",
+    "alembic>=1.16.5",
+    "asyncpg>=0.30.0",
+    "fastapi[standard]>=0.116.1",
+    "pydantic-settings>=2.10.1",
+    "pytest-asyncio>=1.1.0",
+    "sqlmodel>=0.0.24",
+]
+
+[dependency-groups]
+dev = [
     "isort>=6.0.1",
     "mypy>=1.17.1",
     "pre-commit>=4.3.0",
+    "ruff>=0.12.11",
     "pytest>=8.4.1",
     "pytest-factoryboy>=2.8.1",
-    "ruff>=0.12.11",
 ]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+src_paths = ["src",]
+combine_as_imports = true
+balanced_wrapping = true
+skip = [".venv"]
+known_fastapi = [
+    "fastapi",
+    "pydantic",
+    "alembic",
+    "sqlmodel",
+    "pydantic-settings",
+]
+known_third_party = [
+    "asyncpg",
+    "pytest",
+]
+import_heading_stdlib = "stdlib"
+import_heading_thirdparty = "thirdparty"
+import_heading_fastapi = "fastapi"
+import_heading_firstparty = "project"
+import_heading_localfolder = "app"
+sections = [
+    'FUTURE',
+    'STDLIB',
+    'THIRDPARTY',
+    'FASTAPI',
+    'FIRSTPARTY',
+    'LOCALFOLDER',
+]
+
+[tool.ruff]
+exclude = [".venv"]
+line-length = 119
+indent-width = 4
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "C",   # flake8-comprehensions
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "RUF", # ruff-specific rules
+    "TID", # flake8-tidy-imports
+    "TCH", # flake8-type-checking
+    "PTH", # flake8-use-pathlib
+    "PL",  # pylint
+]
+ignore = [
+    "RUF001", # Игнорируем проверку кириллицы в строках
+    "RUF002", # Игнорируем проверку кириллицы в докстрингах
+    "RUF003", # Игнорируем проверку кириллицы в комментариях
+    "I001",   # Игнорируем проверку сортировки импортов, так как используем isort
+    "B904",   # Игнорируем проверку наличия from при raise в обработчиках исключений
+]
+mccabe = { max-complexity = 10 }
+pydocstyle = { convention = "google" }
+pylint = { max-args = 8 }
+
+[tool.mypy]
+python_version = "3.13"
+ignore_missing_imports = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+plugins = ["sqlalchemy.ext.mypy.plugin"]
+namespace_packages = true
+explicit_package_bases = true
