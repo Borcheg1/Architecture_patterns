@@ -10,18 +10,22 @@ dependencies = [
     "fastapi[standard]>=0.116.1",
     "pydantic-settings>=2.10.1",
     "pytest-asyncio>=1.1.0",
-    "sqlmodel>=0.0.24",
-]
-
-[dependency-groups]
-dev = [
     "isort>=6.0.1",
     "mypy>=1.17.1",
     "pre-commit>=4.3.0",
     "ruff>=0.12.11",
     "pytest>=8.4.1",
-    "pytest-factoryboy>=2.8.1",
 ]
+
+#[dependency-groups]
+#dev = [
+#    "isort>=6.0.1",
+#    "mypy>=1.17.1",
+#    "pre-commit>=4.3.0",
+#    "ruff>=0.12.11",
+#    "pytest>=8.4.1",
+#    "pytest-factoryboy>=2.8.1",
+#]
 
 [tool.isort]
 profile = "black"

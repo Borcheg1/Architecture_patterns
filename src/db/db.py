@@ -3,9 +3,7 @@ from collections.abc import AsyncGenerator
 
 # thirdparty
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-
-# fastapi
-from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.ext.asyncio.session import AsyncSession
 
 # project
 from src.core.config import settings

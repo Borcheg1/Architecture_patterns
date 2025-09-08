@@ -30,8 +30,8 @@ class Batch:
         self.reference = ref
         self.product = product
         self.eta = eta
-        self._purchased_quantity = quantity
-        self._allocations: set[OrderLine] = set()
+        self.purchased_quantity = quantity
+        self.allocations: set[OrderLine] = set()
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Batch):
@@ -50,22 +50,22 @@ class Batch:
 
     def allocate(self, order_line: OrderLine) -> None:
         if self.can_allocate(order_line):
-            self._allocations.add(order_line)
+            self.allocations.add(order_line)
 
     def deallocate(self, order_line: OrderLine) -> None:
-        if order_line in self._allocations:
-            self._allocations.remove(order_line)
+        if order_line in self.allocations:
+            self.allocations.remove(order_line)
 
     def can_allocate(self, order_line: OrderLine) -> bool:
         return self.product.title == order_line.product.title and self.available_quantity >= order_line.quantity
 
     @property
     def allocated_quantity(self) -> int:
-        return sum(line.quantity for line in self._allocations)
+        return sum(line.quantity for line in self.allocations)
 
     @property
     def available_quantity(self) -> int:
-        return self._purchased_quantity - self.allocated_quantity
+        return self.purchased_quantity - self.allocated_quantity
 
 
 def allocate(line: OrderLine, batches: list[Batch]) -> str:

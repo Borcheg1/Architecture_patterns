@@ -1,8 +1,6 @@
 # thirdparty
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import registry, relationship
-
-# fastapi
-from sqlmodel import Column, DateTime, ForeignKey, Integer, String, Table
 
 # project
 from src.models.domain_models import Batch, OrderLine, Product
@@ -32,8 +30,16 @@ batches = Table(
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("reference", String(255)),
     Column("product_id", Integer, ForeignKey("products.id")),
-    Column("quantity", Integer),
+    Column("purchased_quantity", Integer),
     Column("eta", DateTime, nullable=True),
+)
+
+allocations = Table(
+    "allocations",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("batch_id", Integer, ForeignKey("batches.id")),
+    Column("order_line_id", Integer, ForeignKey("order_lines.id")),
 )
 
 
@@ -49,10 +55,13 @@ def start_mappers() -> None:
     order_lines_mapper = mapper_registry.map_imperatively(
         OrderLine,
         order_lines,
-        properties={"product": relationship(product_mapper, back_populates="order_lines", lazy="joined")},
+        properties={"product": relationship(product_mapper, back_populates="order_lines")},
     )
-    batches_mapper = mapper_registry.map_imperatively(
+    mapper_registry.map_imperatively(
         Batch,
         batches,
-        properties={"product": relationship(product_mapper, back_populates="batches")},
+        properties={
+            "product": relationship(product_mapper, back_populates="batches"),
+            "allocations": relationship(order_lines_mapper, secondary=allocations, collection_class=set),
+        },
     )
