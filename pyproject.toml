@@ -15,6 +15,7 @@ dependencies = [
     "pre-commit>=4.3.0",
     "ruff>=0.12.11",
     "pytest>=8.4.1",
+    "black>=25.1.0",
 ]
 
 #[dependency-groups]
@@ -38,7 +39,6 @@ known_fastapi = [
     "fastapi",
     "pydantic",
     "alembic",
-    "sqlmodel",
     "pydantic-settings",
 ]
 known_third_party = [

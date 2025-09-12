@@ -1,6 +1,3 @@
-# stdlib
-import datetime
-
 # thirdparty
 import pytest
 
@@ -9,10 +6,10 @@ from src.models.domain_models import Batch, OrderLine, Product
 
 
 @pytest.fixture
-def order_line(quantity: int = 10) -> OrderLine:
-    return OrderLine("order1", Product("SOME-PRODUCT"), quantity=quantity)
+def order_line() -> OrderLine:
+    return OrderLine("order1", Product("SOME-PRODUCT"), quantity=10)
 
 
 @pytest.fixture
-def batch(reference: str, quantity: int = 50, eta: datetime.datetime | None = None) -> Batch:
-    return Batch(ref=reference, product=Product("SOME-PRODUCT"), quantity=quantity, eta=eta)
+def batch() -> Batch:
+    return Batch(ref="batch1", product=Product("SOME-PRODUCT"), quantity=50, eta=None)

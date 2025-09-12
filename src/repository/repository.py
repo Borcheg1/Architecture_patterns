@@ -27,5 +27,24 @@ class SqlAlchemyRepository(AbstractRepository):
         return result.scalar_one()
 
     async def list(self) -> list[Batch]:
-        result = await self.session.execute(select(Batch))
+        result = await self.session.execute(
+            select(Batch).options(
+                joinedload(Batch.product),
+                selectinload(Batch.allocations),
+            )
+        )
         return result.scalars().all()
+
+
+class FakeRepository(AbstractRepository):
+    def __init__(self, batches: list[Batch]) -> None:
+        self._batches = set(batches)
+
+    def add(self, batch: Batch) -> None:
+        self._batches.add(batch)
+
+    def get(self, reference: str) -> Batch:
+        return next(b for b in self._batches if b.reference == reference)
+
+    def list(self) -> list[Batch]:
+        return list(self._batches)
