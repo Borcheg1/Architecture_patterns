@@ -1,15 +1,23 @@
-from typing import Union
+# stdlib
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
+# fastapi
 from fastapi import FastAPI
 
-app = FastAPI()
+# project
+from src.api.router import api_router
+from src.db.db import setup_db
+from src.models.orm_models import start_mappers
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator:
+    setup_db(app)
+    start_mappers()
+    yield
+    await app.state.db_engine.dispose()
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+fastapi_app = FastAPI(lifespan=lifespan)
+fastapi_app.include_router(router=api_router, prefix="/api")

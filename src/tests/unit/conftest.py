@@ -1,25 +1,15 @@
-import datetime
-import random
+# thirdparty
+import pytest
 
-from pytest_factoryboy import register
-
-from src.models.allocate_dto import Batch, OrderLine, Product
-from src.tests.unit.factories import OrderLineFactory, ProductFactory
-
-register(ProductFactory, "product")
-register(OrderLineFactory, "order_line")
+# project
+from src.models.domain_models import Batch, OrderLine, Product
 
 
-def create_order_line_by_product(product: Product, quantity: int = 10) -> OrderLine:
-    return OrderLineFactory.build(product=product, quantity=quantity)
+@pytest.fixture
+def order_line() -> OrderLine:
+    return OrderLine("order1", Product("SOME-PRODUCT"), quantity=10)
 
 
-def prepare_batch(
-    product: Product,
-    reference: str | None = None,
-    quantity: int = 50,
-    eta: datetime.datetime | None = None,
-) -> Batch:
-    if not reference:
-        reference = str(random.randint(1, 100000))
-    return Batch(ref=reference, product=product, quantity=quantity, eta=eta)
+@pytest.fixture
+def batch() -> Batch:
+    return Batch(ref="batch1", product=Product("SOME-PRODUCT"), quantity=50, eta=None)
